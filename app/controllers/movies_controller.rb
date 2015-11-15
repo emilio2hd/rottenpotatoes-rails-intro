@@ -12,6 +12,11 @@ class MoviesController < ApplicationController
 
   def index
     @movies = Movie.all
+
+    unless params[:order].nil? || params[:order].empty?
+      @movies = @movies.order(params[:order])
+      params["#{params[:order]}_header".to_sym] = "hilite"
+    end
   end
 
   def new
