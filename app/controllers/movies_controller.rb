@@ -12,8 +12,15 @@ class MoviesController < ApplicationController
 
   def index
     @movies = Movie.all
+    @all_ratings = Movie.get_ratings
+    @ratings_selected = []
 
-    unless params[:order].nil? || params[:order].empty?
+    unless params[:ratings].nil?
+      @ratings_selected =  params[:ratings].keys
+      @movies = @movies.where(rating: @ratings_selected) unless @ratings_selected.empty?
+    end
+
+    unless "#{params[:order]}".blank?
       @movies = @movies.order(params[:order])
       params["#{params[:order]}_header".to_sym] = "hilite"
     end
