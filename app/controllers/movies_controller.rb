@@ -16,17 +16,27 @@ class MoviesController < ApplicationController
     @ratings_selected = []
     @filter_params = {}
 
-    params[:ratings] ||= session[:ratings]
+    if(params[:ratings].nil? && params[:order].nil?)
+      params[:ratings] ||= session[:ratings]
+      params[:order] ||= session[:order]
 
-    unless params[:ratings].nil?
-      @ratings_selected =  params[:ratings].keys
-      session[:ratings] = params[:ratings]
-      @filter_params.merge!({:ratings => params[:ratings]})
+      @all_ratings.each {|rating| params[:ratings][rating] = "1" } if params[:ratings].nil?
 
-      @movies = @movies.where(rating: @ratings_selected) unless @ratings_selected.empty?
+      flash.keep
+      redirect_to movies_path(params)
     end
 
-    params[:order] ||= session[:order]
+    if params[:ratings].nil?
+      params[:ratings] = {}
+      @all_ratings.each {|rating| params[:ratings][rating] = "1" }
+    end
+
+    @ratings_selected =  params[:ratings].keys
+    session[:ratings] = params[:ratings]
+    @filter_params.merge!({:ratings => params[:ratings]})
+
+    @movies = @movies.where(rating: @ratings_selected) unless @ratings_selected.empty?
+
     unless "#{params[:order]}".blank?
       session[:order] = params[:order]
       @movies = @movies.order(params[:order])
