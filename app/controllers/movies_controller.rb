@@ -20,7 +20,10 @@ class MoviesController < ApplicationController
       params[:ratings] ||= session[:ratings]
       params[:order] ||= session[:order]
 
-      @all_ratings.each {|rating| params[:ratings][rating] = "1" } if params[:ratings].nil?
+      if params[:ratings].nil?
+        params[:ratings] = {}
+        @all_ratings.each {|rating| params[:ratings][rating] = "1" }
+      end
 
       flash.keep
       redirect_to movies_path(params)
