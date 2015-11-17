@@ -14,13 +14,21 @@ class MoviesController < ApplicationController
     @movies = Movie.all
     @all_ratings = Movie.get_ratings
     @ratings_selected = []
+    @filter_params = {}
+
+    params[:ratings] ||= session[:ratings]
 
     unless params[:ratings].nil?
       @ratings_selected =  params[:ratings].keys
+      session[:ratings] = params[:ratings]
+      @filter_params.merge!({:ratings => params[:ratings]})
+
       @movies = @movies.where(rating: @ratings_selected) unless @ratings_selected.empty?
     end
 
+    params[:order] ||= session[:order]
     unless "#{params[:order]}".blank?
+      session[:order] = params[:order]
       @movies = @movies.order(params[:order])
       params["#{params[:order]}_header".to_sym] = "hilite"
     end
